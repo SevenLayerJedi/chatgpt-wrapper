@@ -1,49 +1,82 @@
 import os
 import sys
+import io
 import openai
 import json
 import argparse
 
 
+class bcolors:
+  # Taken from stackoverflow
+  # https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
+  HEADER = '\033[95m'
+  OKBLUE = '\033[94m'
+  OKCYAN = '\033[96m'
+  OKGREEN = '\033[92m'
+  WARNING = '\033[93m'
+  FAIL = '\033[91m'
+  ENDC = '\033[0m'
+  BOLD = '\033[1m'
+  UNDERLINE = '\033[4m'
+
+
 def MAIN(args):
+  OBLIGATORY_BANNER()
   if(args.apikey):
     openai.api_key = args.apikey
-    print("[+] Using API_KEY: **-***************************")
+    print("[" + bcolors.OKGREEN + "+" + bcolors.ENDC + "] " + bcolors.OKCYAN + "Using API_KEY: " + bcolors.ENDC + "**-***************************" + bcolors.ENDC)
   else:
-    print("[-] No API Key was given")
-    print("[-] Exiting")
+    print("[" + bcolors.FAIL + "-" + bcolors.ENDC + "] " + bcolors.FAIL + "No API Key was given" + bcolors.ENDC)
+    print("[" + bcolors.FAIL + "-" + bcolors.ENDC + "] " + bcolors.FAIL + "Exiting..." + bcolors.ENDC)
     sys.exit()
   #
   if(args.question):
     question = args.question
-    print("[+] Asking Question: {0}".format(args.question))
+    print("[" + bcolors.OKGREEN + "+" + bcolors.ENDC + "] " + bcolors.OKCYAN + "Asking Question: " + bcolors.ENDC + "{0}".format(args.question) + bcolors.ENDC)
   else:
-    print("[-] No Question was given")
-    print("[-] Exiting")
+    print("[" + bcolors.FAIL + "-" + bcolors.ENDC + "] " + bcolors.FAIL + "No Question was given" + bcolors.ENDC)
+    print("[" + bcolors.FAIL + "-" + bcolors.ENDC + "] " + bcolors.FAIL + "Exiting..." + bcolors.ENDC)
     sys.exit()
   #
-  print("[+] Model: {0}".format(args.model))
-  print("[+] Temperature: {0}".format(args.temperature))
-  print("[+] Max Tokens: {0}".format(args.maxtokens))
-  print("[+] Top P: {0}".format(args.topp))
-  print("[+] Frequency Penalty: {0}".format(args.frequencypenalty))
-  print("[+] Presence Penalty: {0}".format(args.presencepenalty))
+  print("[" + bcolors.OKGREEN + "+" + bcolors.ENDC + "] " + bcolors.OKCYAN + "Model: " + bcolors.ENDC + "{0}".format(args.model) + bcolors.ENDC)
+  print("[" + bcolors.OKGREEN + "+" + bcolors.ENDC + "] " + bcolors.OKCYAN + "Temperature: " + bcolors.ENDC + "{0}".format(args.temperature) + bcolors.ENDC)
+  print("[" + bcolors.OKGREEN + "+" + bcolors.ENDC + "] " + bcolors.OKCYAN + "Max Tokens: " + bcolors.ENDC + "{0}".format(args.maxtokens) + bcolors.ENDC)
+  print("[" + bcolors.OKGREEN + "+" + bcolors.ENDC + "] " + bcolors.OKCYAN + "Top P: " + bcolors.ENDC + "{0}".format(args.topp) + bcolors.ENDC)
+  print("[" + bcolors.OKGREEN + "+" + bcolors.ENDC + "] " + bcolors.OKCYAN + "Frequency Penalty: " + bcolors.ENDC + "{0}".format(args.frequencypenalty) + bcolors.ENDC)
+  print("[" + bcolors.OKGREEN + "+" + bcolors.ENDC + "] " + bcolors.OKCYAN + "Presence Penalty: " + bcolors.ENDC + "{0}".format(args.presencepenalty) + bcolors.ENDC)
   #
-  print("[+] Sending question to ChatGPT...")
+  print("[" + bcolors.OKGREEN + "+" + bcolors.ENDC + "] " + bcolors.OKCYAN + "Sending question to ChatGPT..." + bcolors.ENDC)
   #
-  response = openai.Completion.create(
-    model=args.model,
-    prompt=question,
-    temperature=args.temperature,
-    max_tokens=args.maxtokens,
-    top_p=args.topp,
-    frequency_penalty=args.frequencypenalty,
-    presence_penalty=args.presencepenalty
-  )
-  #
-  rText = response['choices'][0]['text']
-  print(rText)
+  try:
+    response = openai.Completion.create(
+      model=args.model,
+      prompt=question,
+      temperature=args.temperature,
+      max_tokens=args.maxtokens,
+      top_p=args.topp,
+      frequency_penalty=args.frequencypenalty,
+      presence_penalty=args.presencepenalty
+    )
+    #
+    rText = response['choices'][0]['text']
+    print(rText)
+    print("")
+  except openai.error.AuthenticationError:
+    print("[" + bcolors.FAIL + "-" + bcolors.ENDC + "] " + bcolors.FAIL + "ERROR: BAD API KEY" + bcolors.ENDC)
+  except Exception as e:
+    print("[" + bcolors.FAIL + "-" + bcolors.ENDC + "] " + bcolors.FAIL + "ERROR: {0}".format(e) + bcolors.ENDC)
+
+
+def OBLIGATORY_BANNER():
   print("")
+  with open('banner', mode="r", encoding="utf-8") as f:
+    lines = f.readlines()
+    for l in lines:
+      print(bcolors.OKGREEN + l.rstrip() + bcolors.ENDC)
+    print(bcolors.HEADER + "\t\tPython wrapper created by: Keith Smith" + bcolors.ENDC)
+    print(bcolors.HEADER + "\t\t\tsmith.itpro@gmail.com" + bcolors.ENDC)
+    print(bcolors.HEADER + "\t\t\thttps://twitter.com/SevenLayerJedi" + bcolors.ENDC)
+    print("")
 
 
 if __name__ == "__main__":
