@@ -1,5 +1,7 @@
 # ChatGPT Python Wrapper
 
+![alt text](https://raw.githubusercontent.com/SevenLayerJedi/chatgpt-wrapper/main/ChatGPT%20Python.png?raw=true)
+
 ## How to use
 ### Install Requirements
 python -m pip install -r requirements.txt 
